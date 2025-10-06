@@ -1,5 +1,5 @@
 // Lab 19 - Abstract & Automate Lab 18
-// Commit 3: Added Movie class, automated review.txt w key phrases and also avg. Next will be tying it all together.
+// Commit 3: Added Movie class, automated review generation from file that reads from reviews.txt
 
 #include <iostream>
 #include <fstream>
@@ -69,3 +69,46 @@ public:
     }
 };
 
+int main() {
+    srand(time(0));  // seed for random ratings
+
+    // Load comments from file
+    vector<string> comments;
+    ifstream file("reviews.txt");
+    string line;
+
+    if (!file) {
+        cerr << "Error: reviews.txt not found." << endl;
+        return 1;
+    }
+
+    while (getline(file, line)) {
+        if (!line.empty())
+            comments.push_back(line);
+    }
+    file.close();
+
+    // Create movies
+    vector<Movie> movies = {
+        Movie("Inception"),
+        Movie("The Batman"),
+        Movie("Interstellar"),
+        Movie("Avatar 2")
+    };
+
+    // Give each movie 3 random reviews
+    for (auto& movie : movies) {
+        for (int i = 0; i < 3; i++) {
+            double rating = (rand() % 41 + 10) / 10.0;  // 1.0–5.0
+            string comment = comments[rand() % comments.size()];
+            movie.addReview(rating, comment);
+        }
+    }
+
+    // Display all movie reviews
+    for (auto& movie : movies) {
+        movie.display();
+    }
+
+    return 0;
+}
