@@ -1,58 +1,61 @@
-// created movie class with functions
+// Lab 19 - Abstract & Automate Lab 18
+// Commit 3: Added Movie class, automated review.txt w key phrases and also avg. Next will be tying it all together.
+
 #include <iostream>
+#include <fstream>
 #include <string>
-#include <limits>
+#include <vector>
+#include <cstdlib>   // for rand(), srand()
+#include <ctime>     // for time() seed
+#include <iomanip>   // for setprecision()
 using namespace std;
 
-// Struct for each review node
+// Each node stores one review
 struct Node {
     double rating;
     string comment;
     Node* next;
 };
 
-// Class that stores movie title and linked list of reviews
+// Linked list function: add node to head
+void addToHead(Node*& head, double rating, string comment) {
+    Node* temp = new Node;
+    temp->rating = rating;
+    temp->comment = comment;
+    temp->next = head;
+    head = temp;
+}
+
+// Movie class (title + linked list of reviews)
 class Movie {
 private:
     string title;
-    Node* head;
+    Node* head;  // linked list of reviews
 
 public:
-    // constructor initializes movie title and empty list
     Movie(string t) {
         title = t;
         head = nullptr;
     }
 
-    // add new review at tail (default)
+    // Add a review (always adds to head)
     void addReview(double rating, string comment) {
-        Node* temp = new Node;
-        temp->rating = rating;
-        temp->comment = comment;
-        temp->next = nullptr;
-
-        if (head == nullptr) {
-            head = temp;
-        } else {
-            Node* current = head;
-            while (current->next != nullptr) {
-                current = current->next;
-            }
-            current->next = temp;
-        }
+        addToHead(head, rating, comment);
     }
 
-    // print all reviews and calculate average
-    void displayReviews() {
-        cout << "\nMovie: " << title << endl;
+    // Display all reviews and calculate average
+    void display() {
+        cout << "Movie: " << title << endl;
         Node* current = head;
         int count = 0;
         double total = 0.0;
 
         while (current != nullptr) {
             count++;
-            cout << "    > Review #" << count << ": " << current->rating
-                 << " - " << current->comment << endl;
+            cout << fixed << setprecision(1);
+            cout << "    > Review #" << count << ": "
+                 << current->rating << " - "
+                 << current->comment << endl;
             total += current->rating;
             current = current->next;
         }
@@ -60,35 +63,9 @@ public:
         if (count > 0)
             cout << "    > Average: " << total / count << endl;
         else
-            cout << "No reviews yet.\n";
+            cout << "    > No reviews available." << endl;
+
+        cout << endl;
     }
 };
 
-// main function now just uses the class
-int main() {
-    Movie m("Sample Movie");
-
-    char again;
-    do {
-        double rating;
-        string comment;
-
-        cout << "Enter review rating 0–5: ";
-        cin >> rating;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        cout << "Enter review comment: ";
-        getline(cin, comment);
-
-        m.addReview(rating, comment);
-
-        cout << "Add another review? (Y/N): ";
-        cin >> again;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    } while (again == 'Y' || again == 'y');
-
-    m.displayReviews();
-
-    return 0;
-}
